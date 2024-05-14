@@ -49,20 +49,31 @@ void ASlashCharacter::BeginPlay()
 			Subsystem->AddMappingContext(SlashMappingContext, 0);
 		}
 	}
-	
 }
 
 void ASlashCharacter::Move(const FInputActionValue &Value)
 {
-	// if (ActionState != EActionState::EAS_Unoccupied) return;
 	const FVector2D MovementVector = Value.Get<FVector2D>();
-	const FRotator Rotation = Controller->GetControlRotation();
-	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
 	
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	AddMovementInput(ForwardDirection, MovementVector.Y);
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-	AddMovementInput(RightDirection, MovementVector.X);
+	const FVector Forward = GetActorForwardVector();
+	AddMovementInput(Forward, MovementVector.Y);
+	const FVector Right = GetActorRightVector();
+	AddMovementInput(Right, MovementVector.X);
+
+	// if (!Controller)
+	// {
+	// 	return;
+	// }
+	
+	// if (ActionState != EActionState::EAS_Unoccupied) return;
+	// const FVector2D MovementVector = Value.Get<FVector2D>();
+	// const FRotator Rotation = Controller->GetControlRotation();
+	// const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+	//
+	// const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	// AddMovementInput(ForwardDirection, MovementVector.Y);
+	// const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	// AddMovementInput(RightDirection, MovementVector.X);
 }
 
 void ASlashCharacter::Look(const FInputActionValue& Value)
@@ -73,42 +84,19 @@ void ASlashCharacter::Look(const FInputActionValue& Value)
 	AddControllerYawInput(LookAxisVector.X);
 }
 
-
-
 void ASlashCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	if (UEnhancedInputComponent *EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Move);
-		EnhancedInputComponent->BindAction(LookingAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Look);
-		EnhancedInputComponent->BindAction(JumpingAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Jump);
-		EnhancedInputComponent->BindAction(EKeyAction, ETriggerEvent::Triggered, this, &ASlashCharacter::EKeyPressed);
-		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Attack);
-		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Dodge);
-	}
-}
-
 void ASlashCharacter::Jump()
 {
 	Super::Jump();
-
 	// if (IsUnoccupied())
 	// {
 	// 	Super::Jump();
 	// }
-}
-
-void ASlashCharacter::EKeyPressed()
-{
-	return;
 }
 
 void ASlashCharacter::Attack() 
@@ -121,34 +109,62 @@ void ASlashCharacter::Dodge()
 	return;
 }
 
-void ASlashCharacter::MoveForward(float Value)
+void ASlashCharacter::EKeyPressed()
 {
-	// if (ActionState != EActionState::EAS_Unoccupied) return;
-	if (Controller && (Value != 0.f))
-	{
-		// find out which way is forward
-		const FRotator ControlRotation = GetControlRotation();
-		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+	return;
+}
 
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
+void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	if (UEnhancedInputComponent *EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Move);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Look);
+		EnhancedInputComponent->BindAction(JumpingAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Jump);
+		
+		EnhancedInputComponent->BindAction(EKeyAction, ETriggerEvent::Triggered, this, &ASlashCharacter::EKeyPressed);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Attack);
+		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Dodge);
 	}
 }
 
-void ASlashCharacter::MoveRight(float Value)
-{
-	// if (ActionState != EActionState::EAS_Unoccupied) return;
-	if (Controller && (Value != 0.f))
-	{
-		// find out which way is right
-		const FRotator ControlRotation = GetControlRotation();
-		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
 
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		AddMovementInput(Direction, Value);
-	}
-}
 
+// void ASlashCharacter::MoveForward(float Value)
+// {
+// 	if (!Controller)
+// 	{
+// 		return;
+// 	}
+//
+// 	// if (ActionState != EActionState::EAS_Unoccupied) return;
+// 	if (Controller && (Value != 0.f))
+// 	{
+// 		// find out which way is forward
+// 		const FRotator ControlRotation = Controller->GetControlRotation();
+// 		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+//
+// 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+// 		AddMovementInput(Direction, Value);
+// 	}
+// }
+
+// void ASlashCharacter::MoveRight(float Value)
+// {
+// 	
+// 	// if (ActionState != EActionState::EAS_Unoccupied) return;
+// 	if (Controller && (Value != 0.f))
+// 	{
+// 		// find out which way is right
+// 		const FRotator ControlRotation = GetControlRotation();
+// 		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
+//
+// 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+// 		AddMovementInput(Direction, Value);
+// 	}
+// }
 
 
 

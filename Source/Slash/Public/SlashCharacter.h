@@ -36,7 +36,7 @@ protected:
 	UInputAction* MovementAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
-	UInputAction* LookingAction;
+	UInputAction* LookAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	UInputAction* JumpingAction;
@@ -54,8 +54,8 @@ protected:
 	void Look(const FInputActionValue& Value);
 
 	/** Callbacks for input */
-	void MoveForward(float Value);
-	void MoveRight(float Value);
+	// void MoveForward(float Value);
+	// void MoveRight(float Value);
 	void EKeyPressed();
 	virtual void Attack();
 	void Dodge();
