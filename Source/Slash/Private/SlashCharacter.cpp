@@ -81,12 +81,12 @@ void ASlashCharacter::Look(const FInputActionValue& Value)
 	const FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	// Debug message to check if the Look function is being called
-	UE_LOG(LogTemp, Warning, TEXT("Look function called."));
+	// UE_LOG(LogTemp, Warning, TEXT("Look function called."));
 
 	if (Controller)
 	{
 		// Debug message to print out the input values
-		UE_LOG(LogTemp, Warning, TEXT("Look Axis Vector X: %f, Y: %f"), LookAxisVector.X, LookAxisVector.Y);
+		// UE_LOG(LogTemp, Warning, TEXT("Look Axis Vector X: %f, Y: %f"), LookAxisVector.X, LookAxisVector.Y);
 
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
@@ -106,12 +106,31 @@ void ASlashCharacter::Jump()
 
 void ASlashCharacter::Attack() 
 {
+	if (CanAttack())
+	{
+		PlayAttackMontage();
+		ActionState = EActionState::EAS_Attacking;
+	}
+}
+
+bool ASlashCharacter::CanAttack()
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+void ASlashCharacter::Dodge()
+{
+	return;
+}
+
+void ASlashCharacter::PlayAttackMontage()
+{
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && AttackMontage)
 	{
 		AnimInstance->Montage_Play(AttackMontage);
-		AnimInstance->Montage_Play(AttackMontage);
-		int32 Selection = FMath::RandRange(0,2);
+		const int32 Selection = FMath::RandRange(0,2);
 		FName SectionName = FName();
 		switch (Selection)
 		{
@@ -129,12 +148,6 @@ void ASlashCharacter::Attack()
 		}
 		AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
 	}
-	
-}
-
-void ASlashCharacter::Dodge()
-{
-	return;
 }
 
 void ASlashCharacter::EKeyPressed()
@@ -146,6 +159,13 @@ void ASlashCharacter::EKeyPressed()
 		CharacterState = ECharacterState::ECS_EquippedOneHandWeapon;
 	}
 }
+
+void ASlashCharacter::AttackEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}
+
+
 
 void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
