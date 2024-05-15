@@ -3,6 +3,7 @@
 #include "Item.h"
 #include "Slash/DebugMacros.h"
 #include "Components/SphereComponent.h"
+#include "SlashCharacter.h"
 
 AItem::AItem()
 {
@@ -36,21 +37,20 @@ float AItem::TransformedCos()
 void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) // Function signature must match the signature of the delegate
 {
-	UE_LOG(LogTemp, Warning, TEXT("Item Overlapped"));
-	const FString OtherActorName = OtherActor->GetName();
-	if (GEngine)
+	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
+	if (SlashCharacter)
 	{
-		GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Red, OtherActorName);
+		SlashCharacter->SetOverlappingItem(this);
 	}
 }
 
 void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex)
 {
-	const FString OtherActorName = FString("Ending Overlap with: ") + OtherActor->GetName();
-	if (GEngine)
+	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
+	if (SlashCharacter)
 	{
-		GEngine->AddOnScreenDebugMessage(1, 30.f, FColor::Green, OtherActorName);
+		SlashCharacter->SetOverlappingItem(nullptr);
 	}
 }
 

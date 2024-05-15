@@ -9,6 +9,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "GroomComponent.h"
+#include "Slash/Item.h"
+#include "Slash/Weapons/Weapon.h"
 
 
 ASlashCharacter::ASlashCharacter()
@@ -20,7 +22,7 @@ ASlashCharacter::ASlashCharacter()
 	bUseControllerRotationRoll = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 340.f, 0.f);
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 400.f, 0.f);
 	
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
@@ -60,29 +62,25 @@ void ASlashCharacter::Move(const FInputActionValue &Value)
 	const FVector Right = GetActorRightVector();
 	AddMovementInput(Right, MovementVector.X);
 
-	// if (!Controller)
-	// {
-	// 	return;
-	// }
-	
-	// if (ActionState != EActionState::EAS_Unoccupied) return;
-	// const FVector2D MovementVector = Value.Get<FVector2D>();
-	// const FRotator Rotation = Controller->GetControlRotation();
-	// const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
-	//
-	// const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	// AddMovementInput(ForwardDirection, MovementVector.Y);
-	// const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-	// AddMovementInput(RightDirection, MovementVector.X);
 }
 
 void ASlashCharacter::Look(const FInputActionValue& Value)
 {
 	const FVector2D LookAxisVector = Value.Get<FVector2D>();
 
-	AddControllerPitchInput(LookAxisVector.Y);
-	AddControllerYawInput(LookAxisVector.X);
+	// Debug message to check if the Look function is being called
+	UE_LOG(LogTemp, Warning, TEXT("Look function called."));
+
+	if (Controller)
+	{
+		// Debug message to print out the input values
+		UE_LOG(LogTemp, Warning, TEXT("Look Axis Vector X: %f, Y: %f"), LookAxisVector.X, LookAxisVector.Y);
+
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
+	}
 }
+
 
 void ASlashCharacter::Tick(float DeltaTime)
 {
@@ -111,7 +109,12 @@ void ASlashCharacter::Dodge()
 
 void ASlashCharacter::EKeyPressed()
 {
-	return;
+	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"));
+		CharacterState = ECharacterState::ECS_EquippedOneHandWeapon;
+	}
 }
 
 void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -130,6 +133,46 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	}
 }
 
+// void ASlashCharacter::Move(const FInputActionValue &Value)
+// {
+// 	
+// 	if (!Controller)
+// 	{
+// 		return;
+// 	}
+// 	
+// 	// if (ActionState != EActionState::EAS_Unoccupied) return;
+// 	const FVector2D MovementVector = Value.Get<FVector2D>();
+// 	const FRotator Rotation = Controller->GetControlRotation();
+// 	const FRotator YawRotation(0.f, Rotation.Yaw, 0.f);
+// 	
+// 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+// 	AddMovementInput(ForwardDirection, MovementVector.Y);
+// 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+// 	AddMovementInput(RightDirection, MovementVector.X);
+//
+//
+// }
+
+// void ASlashCharacter::Move(const FInputActionValue &Value)
+// {
+// 	const FVector2D MovementVector = Value.Get<FVector2D>();
+// 	const FRotator MoveRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
+// 	
+//
+// 	if (MovementVector.X > 0.05f || MovementVector.X < -0.05f)
+// 	{
+// 		const FVector Right = MoveRotation.RotateVector(FVector::RightVector);
+// 		AddMovementInput(Right, MovementVector.X);
+// 	}
+//
+// 	if (MovementVector.Y > 0.05f || MovementVector.Y < -0.05f)
+// 	{
+// 		const FVector Forward = MoveRotation.RotateVector(FVector::ForwardVector);
+// 		AddMovementInput(Forward, MovementVector.Y);
+// 	}
+//
+// }
 
 
 // void ASlashCharacter::MoveForward(float Value)

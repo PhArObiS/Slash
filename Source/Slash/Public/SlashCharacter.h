@@ -5,14 +5,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "InputAction.h"
+#include "Characters/CharacterTypes.h"
 #include "SlashCharacter.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
 class UGroomComponent;
 class UInputMappingContext;
-class UInputAction; 
-
+class UInputAction;
+class AItem;
 
 UCLASS()
 class SLASH_API ASlashCharacter : public ACharacter
@@ -29,25 +31,25 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = Input)
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
 	UInputMappingContext* SlashMappingContext;
 
-	UPROPERTY(EditAnywhere, Category = Input)
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
 	UInputAction* MovementAction;
 
-	UPROPERTY(EditAnywhere, Category = Input)
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
 	UInputAction* LookAction;
 
-	UPROPERTY(EditAnywhere, Category = Input)
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
 	UInputAction* JumpingAction;
 	
-	UPROPERTY(EditAnywhere, Category = Input)
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
 	UInputAction* EKeyAction;
 	
-	UPROPERTY(EditAnywhere, Category = Input)
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
 	UInputAction* AttackAction;
 	
-	UPROPERTY(EditAnywhere, Category = Input)
+	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
 	UInputAction* DodgeAction;
 	
 	void Move(const FInputActionValue& Value);
@@ -61,6 +63,8 @@ protected:
 	void Dodge();
 	
 private:
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+	
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent *CameraBoom;
    
@@ -72,4 +76,11 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, Category = Hair)
 	UGroomComponent* Eyebrows;
+
+	UPROPERTY(VisibleInstanceOnly)
+	AItem* OverlappingItem;
+
+public:
+	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 };
