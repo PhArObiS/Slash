@@ -11,6 +11,7 @@
 #include "GroomComponent.h"
 #include "Slash/Item.h"
 #include "Slash/Weapons/Weapon.h"
+#include "Animation/AnimMontage.h"
 
 
 ASlashCharacter::ASlashCharacter()
@@ -27,9 +28,13 @@ ASlashCharacter::ASlashCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->TargetArmLength = 300.F;
+	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->AddRelativeRotation(FRotator(-20.f, 0.f, 0.f));
 	
 	ViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewCamera"));
 	ViewCamera->SetupAttachment(CameraBoom);
+	ViewCamera->bUsePawnControlRotation = false;
+	
 
 	Hair = CreateDefaultSubobject<UGroomComponent>(TEXT("Hair"));
 	Hair->SetupAttachment(GetMesh());
@@ -56,11 +61,18 @@ void ASlashCharacter::BeginPlay()
 void ASlashCharacter::Move(const FInputActionValue &Value)
 {
 	const FVector2D MovementVector = Value.Get<FVector2D>();
-	
-	const FVector Forward = GetActorForwardVector();
-	AddMovementInput(Forward, MovementVector.Y);
-	const FVector Right = GetActorRightVector();
-	AddMovementInput(Right, MovementVector.X);
+
+	if (MovementVector.Y > 0.05f || MovementVector.Y < -0.05f)
+	{
+		const FVector Forward = GetActorForwardVector();
+		AddMovementInput(Forward, MovementVector.Y);	
+	}
+
+	if (MovementVector.X > 0.05f || MovementVector.X < -0.05f)
+	{
+		const FVector Right = GetActorRightVector();
+		AddMovementInput(Right, MovementVector.X);
+	}
 
 }
 
@@ -81,7 +93,6 @@ void ASlashCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-
 void ASlashCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -91,15 +102,34 @@ void ASlashCharacter::Tick(float DeltaTime)
 void ASlashCharacter::Jump()
 {
 	Super::Jump();
-	// if (IsUnoccupied())
-	// {
-	// 	Super::Jump();
-	// }
 }
 
 void ASlashCharacter::Attack() 
 {
-	return;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && AttackMontage)
+	{
+		AnimInstance->Montage_Play(AttackMontage);
+		AnimInstance->Montage_Play(AttackMontage);
+		int32 Selection = FMath::RandRange(0,2);
+		FName SectionName = FName();
+		switch (Selection)
+		{
+		case 0:
+			SectionName = FName("Attack1");
+			break;
+		case 1:
+			SectionName = FName("Attack2");
+			break;
+		case 2:
+			SectionName = FName("Attack3");
+			break;
+		default:
+			break;
+		}
+		AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
+	}
+	
 }
 
 void ASlashCharacter::Dodge()
@@ -150,65 +180,6 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 // 	AddMovementInput(ForwardDirection, MovementVector.Y);
 // 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 // 	AddMovementInput(RightDirection, MovementVector.X);
-//
-//
 // }
-
-// void ASlashCharacter::Move(const FInputActionValue &Value)
-// {
-// 	const FVector2D MovementVector = Value.Get<FVector2D>();
-// 	const FRotator MoveRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
-// 	
-//
-// 	if (MovementVector.X > 0.05f || MovementVector.X < -0.05f)
-// 	{
-// 		const FVector Right = MoveRotation.RotateVector(FVector::RightVector);
-// 		AddMovementInput(Right, MovementVector.X);
-// 	}
-//
-// 	if (MovementVector.Y > 0.05f || MovementVector.Y < -0.05f)
-// 	{
-// 		const FVector Forward = MoveRotation.RotateVector(FVector::ForwardVector);
-// 		AddMovementInput(Forward, MovementVector.Y);
-// 	}
-//
-// }
-
-
-// void ASlashCharacter::MoveForward(float Value)
-// {
-// 	if (!Controller)
-// 	{
-// 		return;
-// 	}
-//
-// 	// if (ActionState != EActionState::EAS_Unoccupied) return;
-// 	if (Controller && (Value != 0.f))
-// 	{
-// 		// find out which way is forward
-// 		const FRotator ControlRotation = Controller->GetControlRotation();
-// 		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
-//
-// 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-// 		AddMovementInput(Direction, Value);
-// 	}
-// }
-
-// void ASlashCharacter::MoveRight(float Value)
-// {
-// 	
-// 	// if (ActionState != EActionState::EAS_Unoccupied) return;
-// 	if (Controller && (Value != 0.f))
-// 	{
-// 		// find out which way is right
-// 		const FRotator ControlRotation = GetControlRotation();
-// 		const FRotator YawRotation(0.f, ControlRotation.Yaw, 0.f);
-//
-// 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-// 		AddMovementInput(Direction, Value);
-// 	}
-// }
-
-
 
 

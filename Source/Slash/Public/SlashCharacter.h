@@ -15,6 +15,7 @@ class UGroomComponent;
 class UInputMappingContext;
 class UInputAction;
 class AItem;
+class UAnimMontage;
 
 UCLASS()
 class SLASH_API ASlashCharacter : public ACharacter
@@ -54,10 +55,7 @@ protected:
 	
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-
-	/** Callbacks for input */
-	// void MoveForward(float Value);
-	// void MoveRight(float Value);
+	
 	void EKeyPressed();
 	virtual void Attack();
 	void Dodge();
@@ -79,6 +77,13 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
+
+	/**
+	 * Animation montages
+	 */
+
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* AttackMontage;
 
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
