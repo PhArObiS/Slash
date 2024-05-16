@@ -60,6 +60,7 @@ void ASlashCharacter::BeginPlay()
 
 void ASlashCharacter::Move(const FInputActionValue &Value)
 {
+	if (ActionState == EActionState::EAS_Attacking) return;
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (MovementVector.Y > 0.05f || MovementVector.Y < -0.05f)
@@ -104,6 +105,33 @@ void ASlashCharacter::Jump()
 	Super::Jump();
 }
 
+void ASlashCharacter::EKeyPressed() //******************************
+{
+	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"));
+		// OverlappingWeapon = nullptr;
+		OverlappingItem = nullptr;
+		CharacterState = ECharacterState::ECS_EquippedOneHandWeapon;
+		EquippedWeapon = OverlappingWeapon;
+	}
+	else
+	{
+		if (CanDisarm())
+		{
+			PlayEquipMontage(FName("Unequip"));
+			CharacterState = ECharacterState::ECS_Unequipped;
+		}
+		else if (CanArm())
+		{
+			PlayEquipMontage(FName("Equip"));
+			CharacterState = ECharacterState::ECS_EquippedOneHandWeapon;
+			
+		}
+	}
+}
+
 void ASlashCharacter::Attack() 
 {
 	if (CanAttack())
@@ -113,15 +141,23 @@ void ASlashCharacter::Attack()
 	}
 }
 
-bool ASlashCharacter::CanAttack()
+bool ASlashCharacter::CanAttack() //********************************
 {
 	return ActionState == EActionState::EAS_Unoccupied &&
 		CharacterState != ECharacterState::ECS_Unequipped;
 }
 
-void ASlashCharacter::Dodge()
+bool ASlashCharacter::CanDisarm() //*********************************
 {
-	return;
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+bool ASlashCharacter:: CanArm() //*************************
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState == ECharacterState::ECS_Unequipped &&
+			EquippedWeapon;
 }
 
 void ASlashCharacter::PlayAttackMontage()
@@ -150,22 +186,31 @@ void ASlashCharacter::PlayAttackMontage()
 	}
 }
 
-void ASlashCharacter::EKeyPressed()
+void ASlashCharacter::PlayEquipMontage(FName SectionName)
 {
-	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
-	if (OverlappingWeapon)
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
 	{
-		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"));
-		CharacterState = ECharacterState::ECS_EquippedOneHandWeapon;
+		UE_LOG(LogTemp, Warning, TEXT("PlayEquipMontage called. SectionName: %s"), *SectionName.ToString());
+		AnimInstance->Montage_Play(EquipMontage);
+		AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayEquipMontage failed. AnimInstance or EquipMontage is nullptr."));
 	}
 }
+
 
 void ASlashCharacter::AttackEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
 }
 
-
+void ASlashCharacter::Dodge()
+{
+	return;
+}
 
 void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -175,10 +220,10 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	{
 		EnhancedInputComponent->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Look);
-		EnhancedInputComponent->BindAction(JumpingAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Jump);
-		
-		EnhancedInputComponent->BindAction(EKeyAction, ETriggerEvent::Triggered, this, &ASlashCharacter::EKeyPressed);
-		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Attack);
+		// EnhancedInputComponent->BindAction(JumpingAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpingAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(EKeyAction, ETriggerEvent::Started, this, &ASlashCharacter::EKeyPressed);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ASlashCharacter::Attack);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Triggered, this, &ASlashCharacter::Dodge);
 	}
 }
