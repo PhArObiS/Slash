@@ -27,7 +27,12 @@ public:
 	ASlashCharacter();
 	virtual void Tick(float DeltaTime) override;  
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	virtual void Jump() override;
+	
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+	
+
+	
 	
 
 protected:
@@ -59,6 +64,7 @@ protected:
 	
 	void EKeyPressed();
 	virtual void Attack();
+	virtual void Jump() override;
 	void Dodge();
 
 	/**
