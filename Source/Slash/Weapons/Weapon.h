@@ -21,7 +21,9 @@ public:
 	AWeapon();
 	void Equip(USceneComponent* InParent, FName InSocketName);
 	void AttachToSocket(USceneComponent* InParent, FName InSocketName);
-	
+
+	TArray<AActor*> IgnoreActors;
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -44,6 +46,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* BoxTraceEnd;
+
 
 public:
 	FORCEINLINE UBoxComponent* GetWeaponBox() const { return WeaponBox; }

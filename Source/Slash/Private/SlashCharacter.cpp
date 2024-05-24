@@ -59,6 +59,15 @@ void ASlashCharacter::BeginPlay()
 	}
 }
 
+void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
+{
+	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
+	{
+		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
+		EquippedWeapon->IgnoreActors.Empty();
+	}
+}
+
 void ASlashCharacter::Move(const FInputActionValue &Value)
 {
 	if (ActionState != EActionState::EAS_Unoccupied) return;
@@ -99,7 +108,7 @@ void ASlashCharacter::Jump()
 	Super::Jump();
 }
 
-void ASlashCharacter::EKeyPressed() //******************************
+void ASlashCharacter::EKeyPressed()
 {
 	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 	if (OverlappingWeapon)
@@ -206,10 +215,10 @@ void ASlashCharacter::PlayAttackMontage()
 	}
 }
 
-void ASlashCharacter::PlayEquipMontage(FName SectionName)
+void ASlashCharacter::PlayEquipMontage(const FName& SectionName)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance)
+	if (AnimInstance && EquipMontage)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("PlayEquipMontage called. SectionName: %s"), *SectionName.ToString());
 		AnimInstance->Montage_Play(EquipMontage);
@@ -241,13 +250,6 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	}
 }
 
-void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
-{
-	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
-	{
-		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-	}
-}
 
 // void ASlashCharacter::Move(const FInputActionValue &Value)
 // {

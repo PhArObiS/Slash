@@ -31,10 +31,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
 	
-
-	
-	
-
 protected:
 	virtual void BeginPlay() override;
 
@@ -77,7 +73,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void AttackEnd();
 
-	void PlayEquipMontage(FName SectionName);
+	void PlayEquipMontage(const FName& SectionName);
 	bool CanDisarm();
 	bool CanArm();
 
