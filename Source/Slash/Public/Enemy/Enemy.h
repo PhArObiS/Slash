@@ -39,9 +39,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	UAnimMontage* HitReactMontage;
 
-	UPROPERTY(EditAnywhere, Category = SOunds)
+	UPROPERTY(EditAnywhere, Category = Sounds)
 	USoundBase* HitSound;
-  
+
+	UPROPERTY(EditAnywhere, Category = VisulaEffects)
+	UParticleSystem* HitParticles;
 
 public:	
 	

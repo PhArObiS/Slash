@@ -205,9 +205,6 @@ void ASlashCharacter::PlayAttackMontage()
 		case 2:
 			SectionName = FName("Attack3");
 			break;
-		case 3:
-			SectionName = FName("Attack4");
-			break;
 		default:
 			break;
 		}
