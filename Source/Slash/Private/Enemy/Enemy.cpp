@@ -36,6 +36,11 @@ AEnemy::AEnemy()
 	
 }
 
+void AEnemy::PatrolTimerFinished()
+{
+	MoveToTarget(PatrolTarget);
+}
+
 void AEnemy::BeginPlay()
 {
 	// Call the parent class's BeginPlay function to ensure any functionality there is executed
@@ -52,38 +57,12 @@ void AEnemy::BeginPlay()
 	EnemyController = Cast<AAIController>(GetController());
     
 	// Check if the cast was successful and if PatrolTarget is set (not null)
-	if (EnemyController && PatrolTarget)
-	{
-		// Create a move request to the PatrolTarget
-		FAIMoveRequest MoveRequest;
-		MoveRequest.SetGoalActor(PatrolTarget);        // Set the patrol target as the goal for the move request
-		MoveRequest.SetAcceptanceRadius(15.f);         // Set the acceptance radius for reaching the target
-
-		// Pointer to store the calculated navigation path
-		FNavPathSharedPtr NavPath;
-
-		// Instruct the enemy controller to move to the goal actor using the move request and store the path
-		EnemyController->MoveTo(MoveRequest, &NavPath);
-
-		// Get the points that make up the navigation path
-		TArray<FNavPathPoint>& PathPoints = NavPath->GetPathPoints();
-
-		// Iterate through each point in the navigation path
-		for (auto& Point : PathPoints)
-		{
-			// Get the location of the current path point
-			const FVector& Location = Point.Location;
-
-			// Draw a debug sphere at each path point's location for visualization purposes
-			DrawDebugSphere(GetWorld(), Location, 12.f, 12, FColor::Green, false, 10.f);
-		}
-	}
+	MoveToTarget(PatrolTarget);
 }
 
 
 void AEnemy::Die()
 {
-	/* TODO: Play Death Montage */
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && DeathMontage)
 	{
@@ -134,6 +113,48 @@ void AEnemy::Die()
 	SetLifeSpan(3.f);
 }
 
+bool AEnemy::InTargetRange(AActor* Target, double Radius)
+{
+	if (Target == nullptr) return false;
+	const double DistanceToTarget = (Target->GetActorLocation() - GetActorLocation()).Size();
+	
+	DRAW_SPHERE_SingleFrame(GetActorLocation());
+	DRAW_SPHERE_SingleFrame(Target->GetActorLocation());
+	
+	return DistanceToTarget <= Radius;
+}
+
+void AEnemy::MoveToTarget(AActor* Target)
+{
+	if (EnemyController == nullptr || Target == nullptr) return;
+	// Create a move request to the PatrolTarget
+	FAIMoveRequest MoveRequest;
+	MoveRequest.SetGoalActor(Target);        // Set the patrol target as the goal for the move request
+	MoveRequest.SetAcceptanceRadius(15.f);         // Set the acceptance radius for reaching the target
+	// Instruct the enemy controller to move to the goal actor using the move request and store the path
+	EnemyController->MoveTo(MoveRequest);
+}
+
+AActor* AEnemy::ChoosePatrolTarget()
+{
+	TArray<AActor*> ValidTargets;
+	for (AActor* Target : PatrolTargets)
+	{
+		if (Target != PatrolTarget)
+		{
+			ValidTargets.AddUnique(Target);
+		}
+	}
+	
+	const int32 NumPatrolTargets = ValidTargets.Num();
+	if (NumPatrolTargets > 0)
+	{
+		const int32 TargetSelection = FMath::RandRange(0, NumPatrolTargets -1);
+		return ValidTargets[TargetSelection];
+	}
+	return nullptr;
+}
+
 void AEnemy::PlayHitReactMontage(const FName& SectionName)
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -145,22 +166,35 @@ void AEnemy::PlayHitReactMontage(const FName& SectionName)
 	}
 }
 
+void AEnemy::CheckCombatTarget()
+{
+	if (!InTargetRange(CombatTarget, CombatRadius))
+	{
+		CombatTarget = nullptr;
+		if (HealthBarWidget)
+		{
+			HealthBarWidget->SetVisibility(false);
+		}
+	}
+}
+
+void AEnemy::CheckPatrolTarget()
+{
+	if (InTargetRange(PatrolTarget, PatrolRadius))
+	{
+		PatrolTarget = ChoosePatrolTarget();
+		const float WaitTime = FMath::RandRange(PatrolWaitMin, PatrolWaitMax);
+		GetWorldTimerManager().SetTimer(PatrolTimer, this, &AEnemy::PatrolTimerFinished, WaitTime);
+	}
+}
+
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CombatTarget)
-	{
-		const double DistanceToTarget = (CombatTarget->GetActorLocation() - GetActorLocation()).Size();
-		if (DistanceToTarget > CombatRadius)
-		{
-			CombatTarget = nullptr;
-			if (HealthBarWidget)
-			{
-				HealthBarWidget->SetVisibility(false);
-			}
-		}
-	}
+	CheckCombatTarget();
+
+	CheckPatrolTarget();
 }
 
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
