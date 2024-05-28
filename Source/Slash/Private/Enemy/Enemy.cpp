@@ -10,7 +10,10 @@
 #include "Components/AttributeComponent.h"
 #include "Components/Widget.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/HealthBarComponent.h"
+#include "AIController.h"
+#include "Navigation/PathFollowingComponent.h"
 
 
 AEnemy::AEnemy()
@@ -25,17 +28,58 @@ AEnemy::AEnemy()
 	Attributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
 	HealthBarWidget->SetupAttachment(GetRootComponent());
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
 	
 }
 
 void AEnemy::BeginPlay()
 {
+	// Call the parent class's BeginPlay function to ensure any functionality there is executed
 	Super::BeginPlay();
+
+	// Check if the HealthBarWidget is valid (not null)
 	if (HealthBarWidget)
 	{
+		// Hide the health bar widget initially
 		HealthBarWidget->SetVisibility(false);
 	}
+
+	// Attempt to cast the controller of this enemy to an AAIController
+	EnemyController = Cast<AAIController>(GetController());
+    
+	// Check if the cast was successful and if PatrolTarget is set (not null)
+	if (EnemyController && PatrolTarget)
+	{
+		// Create a move request to the PatrolTarget
+		FAIMoveRequest MoveRequest;
+		MoveRequest.SetGoalActor(PatrolTarget);        // Set the patrol target as the goal for the move request
+		MoveRequest.SetAcceptanceRadius(15.f);         // Set the acceptance radius for reaching the target
+
+		// Pointer to store the calculated navigation path
+		FNavPathSharedPtr NavPath;
+
+		// Instruct the enemy controller to move to the goal actor using the move request and store the path
+		EnemyController->MoveTo(MoveRequest, &NavPath);
+
+		// Get the points that make up the navigation path
+		TArray<FNavPathPoint>& PathPoints = NavPath->GetPathPoints();
+
+		// Iterate through each point in the navigation path
+		for (auto& Point : PathPoints)
+		{
+			// Get the location of the current path point
+			const FVector& Location = Point.Location;
+
+			// Draw a debug sphere at each path point's location for visualization purposes
+			DrawDebugSphere(GetWorld(), Location, 12.f, 12, FColor::Green, false, 10.f);
+		}
+	}
 }
+
 
 void AEnemy::Die()
 {
