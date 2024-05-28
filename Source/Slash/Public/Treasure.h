@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Slash/Item.h"
+#include "Slash/Public/Item.h"
 #include "Treasure.generated.h"
 
 /**

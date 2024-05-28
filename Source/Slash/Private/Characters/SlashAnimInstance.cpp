@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SlashAnimInstance.h"
-#include "SlashCharacter.h"
+#include "Slash/Public/Characters/SlashAnimInstance.h"
+#include "Slash/Public/Characters/SlashCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 

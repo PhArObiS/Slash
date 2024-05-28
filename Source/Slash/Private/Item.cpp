@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Item.h"
+#include "Slash/Public/Item.h"
 #include "Slash/DebugMacros.h"
 #include "Components/SphereComponent.h"
-#include "SlashCharacter.h"
+#include "Slash/Public/Characters/SlashCharacter.h"
 #include "NiagaraComponent.h"
 
 AItem::AItem()
