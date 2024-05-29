@@ -87,7 +87,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	float PatrolWaitMax = 10.f;
-	
+
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 protected:
 	virtual void BeginPlay() override;
 
