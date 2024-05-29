@@ -12,7 +12,6 @@
 #include "Slash/Public/Item.h"
 #include "Slash/Public/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
-#include "Components/BoxComponent.h"
 
 
 ASlashCharacter::ASlashCharacter()
@@ -59,15 +58,6 @@ void ASlashCharacter::BeginPlay()
 	}
 
 	Tags.Add(FName("SlashCharacter"));
-}
-
-void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
-{
-	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
-	{
-		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquippedWeapon->IgnoreActors.Empty();
-	}
 }
 
 void ASlashCharacter::Move(const FInputActionValue &Value)
