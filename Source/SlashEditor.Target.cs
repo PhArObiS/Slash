@@ -9,7 +9,8 @@ public class SlashEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V4;
+		// IncludeOrderVersion = EngineIncludeOrderVersion.Latest; // Set to the latest include order version
 
-		ExtraModuleNames.AddRange( new string[] { "Slash" } );
+		ExtraModuleNames.AddRange(new string[] { "Slash" });
 	}
 }
