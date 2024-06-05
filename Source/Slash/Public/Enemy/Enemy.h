@@ -26,7 +26,7 @@ public:
 	/** </AActor> */
 
 	/** <IHitInterface> */
-	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	/** </IHitInterface> */
 	
 
@@ -96,9 +96,6 @@ private:
 	/**
 	 * Animation montages
 	 */
-
-	UPROPERTY()
-	AActor* CombatTarget;
 
 	UPROPERTY(EditAnywhere)
 	double CombatRadius = 500.f;

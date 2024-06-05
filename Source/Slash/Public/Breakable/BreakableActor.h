@@ -16,7 +16,7 @@ public:
 	ABreakableActor();
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -31,7 +31,7 @@ private:
 	UPROPERTY(EditAnywhere,Category = "Breakable Properties")
 	TArray<TSubclassOf<class ATreasure>> TreasureClasses;
 
-	bool bBroken = false;
+	bool Broken = false;
 public:	
 
 };

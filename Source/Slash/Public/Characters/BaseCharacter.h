@@ -22,6 +22,9 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+
+	/** Combat */
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	virtual void Attack();
 	virtual void Die();
 	void DirectionalHitReact(const FVector& ImpactPoint);
@@ -32,14 +35,19 @@ protected:
 	virtual bool CanAttack();
 	bool IsAlive();
 	
-	/**
-	* Play montage functions
-	*/
+	/** Play montage functions */
 	
 	void PlayHitReactMontage(const FName& SectionName);
 	virtual int32 PlayAttackMontage();
 	virtual int32 PlayDeathMontage();
+	void StopAttackMontage();
 
+	UFUNCTION(BlueprintCallable)
+	FVector GetTranslationWarpTarget();
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetRotationWarpTarget();
+	
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
 	
@@ -56,27 +64,33 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UAttributeComponent* Attributes;
 
+	UPROPERTY(BlueprintReadOnly, Category = Combat)
+	AActor* CombatTarget;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	double WarpTargetDistance = 75.f;
+
 private:
 	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
 	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
 	
-	UPROPERTY(EditAnywhere, Category = Sounds)
+	UPROPERTY(EditAnywhere, Category = Combat)
 	USoundBase* HitSound;
 
-	UPROPERTY(EditAnywhere, Category = VisulaEffects)
+	UPROPERTY(EditAnywhere, Category = Combat)
 	UParticleSystem* HitParticles;
 	
 	/**
 	 * Animation Montages
 	*/
 
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	UAnimMontage* AttackMontage;
 
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	UAnimMontage* HitReactMontage;
 
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UPROPERTY(EditDefaultsOnly, Category = Combat)
 	UAnimMontage* DeathMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = Combat)
