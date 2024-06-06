@@ -17,6 +17,7 @@ class UInputMappingContext;
 class UInputAction;
 class AItem;
 class UAnimMontage;
+class USlashOverlay;
 
 UCLASS()
 class SLASH_API ASlashCharacter : public ABaseCharacter
@@ -60,9 +61,6 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void HitReactEnd();
 
-	
-
-
 	UPROPERTY(EditAnywhere, Category = "Enhanced Input")
 	UInputMappingContext* SlashMappingContext;
 
@@ -86,6 +84,10 @@ protected:
 	 
 	 
 private:
+	bool IsUnoccupied();
+	void InitializeInputSubsystem();
+	void InitializeSlashOverlay();
+	void SetHUDHealth();
 	/** Character components */
 	
 	UPROPERTY(VisibleAnywhere)
@@ -110,6 +112,8 @@ private:
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	EActionState ActionState = EActionState::EAS_Unoccupied;
 
+	UPROPERTY()
+	USlashOverlay* SlashOverlay;
 public:
 	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
