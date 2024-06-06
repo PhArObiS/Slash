@@ -7,7 +7,6 @@
 #include "Components/AttributeComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
-#include "Slash/DebugMacros.h"
 
 
 
@@ -41,10 +40,16 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 
 void ABaseCharacter::Attack()
 {
+	if (CombatTarget && CombatTarget->ActorHasTag(FName("Dead")))
+	{
+		CombatTarget = nullptr;
+	}
 }
 
 void ABaseCharacter::Die()
 {
+	Tags.Add(FName("Dead"));
+	PlayDeathMontage();
 }
 
 void ABaseCharacter::PlayHitReactMontage(const FName& SectionName)
@@ -163,7 +168,13 @@ int32 ABaseCharacter::PlayAttackMontage()
 
 int32 ABaseCharacter::PlayDeathMontage()
 {
-	return PlayRandomMontageSection(DeathMontage, DeathMontageSections );
+	const int32 Selection = PlayRandomMontageSection(DeathMontage, DeathMontageSections );
+	TEnumAsByte<EDeathPose> Pose(Selection);
+	if (Pose < EDeathPose::EDP_MAX)
+	{
+		DeathPose = Pose;
+	}
+	return Selection;
 }
 
 void ABaseCharacter::StopAttackMontage()
@@ -210,6 +221,11 @@ bool ABaseCharacter::CanAttack()
 bool ABaseCharacter::IsAlive()
 {
 	return Attributes && Attributes->IsAlive();
+}
+
+void ABaseCharacter::DisableMeshCollision()
+{
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ABaseCharacter::AttackEnd()
