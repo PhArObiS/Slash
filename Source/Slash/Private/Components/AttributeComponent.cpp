@@ -9,6 +9,15 @@ UAttributeComponent::UAttributeComponent()
 
 }
 
+void UAttributeComponent::AddSouls(int32 NumberOfSouls)
+{
+	Souls += NumberOfSouls;
+}
+
+void UAttributeComponent::AddGold(int32 AmountOfGold)
+{
+	Gold += AmountOfGold;
+}
 
 void UAttributeComponent::BeginPlay()
 {
