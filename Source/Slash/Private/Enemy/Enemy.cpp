@@ -87,6 +87,10 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) /
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	StopAttackMontage();
+	if (IsInsideAttackRadius())
+	{
+		if (!IsDead()) StartAttackTimer();
+	}
 }
 
 void AEnemy::BeginPlay()
@@ -309,7 +313,7 @@ void AEnemy::MoveToTarget(AActor* Target)
 	// Create a move request to the PatrolTarget
 	FAIMoveRequest MoveRequest;
 	MoveRequest.SetGoalActor(Target);        // Set the patrol target as the goal for the move request
-	MoveRequest.SetAcceptanceRadius(50.f);         // Set the acceptance radius for reaching the target
+	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);         // Set the acceptance radius for reaching the target
 	// Instruct the enemy controller to move to the goal actor using the move request and store the path
 	EnemyController->MoveTo(MoveRequest);
 }

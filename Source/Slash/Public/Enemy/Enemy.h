@@ -44,7 +44,7 @@ protected:
 	virtual void AttackEnd() override;
 	/** </ABaseCharacter> */
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 
 private:
@@ -99,6 +99,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	double AttackRadius = 150.f;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	double AcceptanceRadius = 50.f;
 
 	/**
 	 * Navigation
