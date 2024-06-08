@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Slash/Public/Item.h"
+#include "Items/Item.h"
 #include "Interfaces/PickupInterface.h"
 #include "Components/SphereComponent.h"
 #include "NiagaraComponent.h"

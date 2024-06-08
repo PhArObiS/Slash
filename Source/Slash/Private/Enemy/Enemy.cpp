@@ -8,9 +8,9 @@
 #include "Perception/PawnSensingComponent.h"
 #include "Components/AttributeComponent.h"
 #include "HUD/HealthBarComponent.h"
-#include "Weapons/Weapon.h"
+#include "Items/Weapons/Weapon.h"
 #include "Navigation/PathFollowingComponent.h"
-#include "Soul.h"
+#include "Items/Soul.h"
 
 AEnemy::AEnemy()
 {
@@ -340,7 +340,7 @@ void AEnemy::SpawnDefaultWeapon()
 	if (World && WeaponClass)
 	{
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(WeaponClass);
-		DefaultWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
+		DefaultWeapon->Equip(GetMesh(), FName("WeaponSocket"), this, this);
 		EquippedWeapon = DefaultWeapon;
 	}
 }

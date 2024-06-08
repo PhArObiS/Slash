@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Slash/Public/Weapons/Weapon.h"
+#include "Slash/Public/Items/Weapons/Weapon.h"
 #include "Slash/Public/Characters/SlashCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/SphereComponent.h"

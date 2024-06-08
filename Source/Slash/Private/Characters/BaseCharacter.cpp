@@ -3,7 +3,7 @@
 
 #include "Characters/BaseCharacter.h"
 #include "Components/BoxComponent.h"
-#include "Slash/Public/Weapons/Weapon.h"
+#include "Items/Weapons/Weapon.h"
 #include "Components/AttributeComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"

@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Soul.h"
+#include "Items/Soul.h"
 #include "Interfaces/PickupInterface.h"
 
 

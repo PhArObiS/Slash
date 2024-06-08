@@ -10,15 +10,15 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "GroomComponent.h"
-#include "Soul.h"
+#include "Items/Soul.h"
 #include "Components/AttributeComponent.h"
-#include "Slash/Public/Item.h"
-#include "Slash/Public/Weapons/Weapon.h"
+#include "Items/Item.h"
+#include "Items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
 #include "HUD/SlashHUD.h"
 #include "HUD/SlashOverlay.h"
-#include "Soul.h"
-#include "Treasure.h"
+#include "Items/Soul.h"
+#include "Items/Treasure.h"
 
 
 ASlashCharacter::ASlashCharacter()
