@@ -37,7 +37,7 @@ protected:
 	/** </AActor> */
 
 	/** <ABaseCharacter> */
-	virtual void Die() override;
+	virtual void Die_Implementation() override;
 	virtual void Attack() override;
     virtual bool CanAttack() override;
     virtual void HandleDamage(float DamageAmount) override;
